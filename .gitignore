@@ -8,3 +8,4 @@ data/
 test.py
 .log
 logs/
+.idx
