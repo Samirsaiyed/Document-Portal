@@ -2,12 +2,13 @@ import os, sys
 
 from logger.custom_logger import CustomLogger
 from exception.custom_exception import DocumentPortalException
-from utils.config_loader import Config
+from utils.config_loader import load_config
 from utils.model_loader import ModelLoader
 from model.models import *
 from prompt.prompt_libraries import *
 
-from langchain.output_parsers import JsonOutputToolsParser, OutputFixingParser
+from langchain_core.output_parsers import JsonOutputParser
+from langchain.output_parsers import OutputFixingParser
 
 class DocumentAnalyzer:
     """
@@ -23,7 +24,7 @@ class DocumentAnalyzer:
             self.llm = self.loader.load_llm()
 
             # Create parser
-            self.parser = JsonOutputToolsParser(pydantic_object=Metadata)
+            self.parser = JsonOutputParser(pydantic_object=Metadata)
             self.fixing_parser = OutputFixingParser.from_llm(parser=self.parser, llm=self.llm)
 
             self.prompt = prompt
@@ -44,14 +45,14 @@ class DocumentAnalyzer:
 
             response = chain.invoke({
                 "format_instructions": self.parser.get_format_instructions(),
-                "document_text": self.document_text
+                "document_text": document_text
             })
 
             self.log.info("Meta-data analysis chain executed", keys=list(response.keys()))
             return response
 
         except Exception as e:
-            self.log.error(f"Metadata analysis failed: error=str{e}")
+            self.log.error(f"Metadata analysis failed:", error=str(e))
             raise DocumentPortalException("Metadata extraction failed") from e
 
     
