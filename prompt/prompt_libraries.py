@@ -1,7 +1,7 @@
 from langchain.prompts import ChatPromptTemplate
 
 # prepare prompt template
-prompt = ChatPromptTemplate.from_template(
+document_analysis_prompt = ChatPromptTemplate.from_template(
     """
     You are a highly capable assistant trained to analyze and summarize documents.
     Return ONLY valid JSON matching the exact schema below.
@@ -12,4 +12,29 @@ prompt = ChatPromptTemplate.from_template(
     {document_text}
     """
 )
+
+document_comparision_prompt = ChatPromptTemplate(
+    """
+    You will be provided with content from two PDFs. Your tasks are as follows:
+    
+    1. Compare the content in two PDFs
+    2. Identify the difference in PDF and note down the page number
+    3. The output you provided must be page wise comparision content
+    4. If any page do not have any change, mention as 'NO CHANGE'
+
+    Input documents:
+
+    {combined_docs}
+
+    Your response should follow this format:
+
+    {format_instruction}
+    """
+)
+
+PROMPT_REGISTRY = {"document_analysis": document_analysis_prompt, 
+                   "document_comparision": document_comparision_prompt,
+                }
+
+
 
